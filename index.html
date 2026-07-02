@@ -457,16 +457,6 @@
             border-radius: 6px;
         }
 
-        .modal-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-        }
-
         .tab-buttons {
             display: flex;
             gap: 8px;
@@ -568,6 +558,21 @@
 
         .admin-table tr:hover {
             background-color: var(--color-bg);
+        }
+
+        .filter-tag {
+            padding: 6px 12px;
+            background-color: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .filter-tag.active {
+            background-color: var(--color-primary);
+            color: var(--color-white);
+            border-color: var(--color-primary);
         }
 
         @media (max-width: 768px) {
@@ -800,11 +805,12 @@
             <h2 class="modal-title">登入/註冊</h2>
 
             <div class="tab-buttons">
-                <button class="tab-btn active" onclick="switchAuthTab('login')">登入</button>
+                <button class="tab-btn active" onclick="switchAuthTab('login')">一般登入</button>
                 <button class="tab-btn" onclick="switchAuthTab('signup')">註冊</button>
+                <button class="tab-btn" onclick="switchAuthTab('admin')">管理員</button>
             </div>
 
-            <!-- 登入表單 -->
+            <!-- 一般登入表單 -->
             <div id="login-tab" class="auth-tab active">
                 <form id="login-form">
                     <div class="form-group">
@@ -840,6 +846,23 @@
                     </div>
 
                     <button type="submit" class="btn btn-primary" style="width: 100%;">註冊</button>
+                </form>
+            </div>
+
+            <!-- 管理員登入表單 -->
+            <div id="admin-tab" class="auth-tab">
+                <form id="admin-form">
+                    <div class="alert alert-info">
+                        <strong>⚙️ 管理員模式</strong>
+                        <p style="margin-top: 8px; font-size: 14px;">只需輸入授權的管理員邮箱</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">📧 管理員 Email</label>
+                        <input type="email" id="admin-email" class="form-input" placeholder="admin@example.com" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">進入管理面板</button>
                 </form>
             </div>
 
@@ -879,14 +902,13 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // 管理員列表 - 可以在這裡添加管理員邮箱
-   const ADMIN_EMAILS = ['4a670040us@gmail.com'];
-
+        // 管理員列表 - 修改這裡添加管理員邮箱
+        const ADMIN_EMAILS = ['admin@ticket-anti-scam.com'];
 
         window.questions = [];
         window.currentUser = null;
+        window.adminUser = null;
         window.selectedPlatformFilter = '';
-        window.userVotes = {}; // 追踪用户的投票
 
         // 監聽認證狀態
         onAuthStateChanged(auth, (user) => {
@@ -901,18 +923,18 @@
             const adminBtn = document.getElementById('admin-btn');
             const adminBadge = document.getElementById('admin-badge');
 
-            if (window.currentUser) {
+            if (window.currentUser || window.adminUser) {
                 authStatus.style.display = 'none';
                 userLogged.style.display = 'flex';
-                document.getElementById('user-email').textContent = window.currentUser.email;
                 
-                // 檢查是否是管理員
-                if (ADMIN_EMAILS.includes(window.currentUser.email)) {
-                    adminBtn.style.display = 'block';
+                if (window.adminUser) {
+                    document.getElementById('user-email').textContent = window.adminUser;
                     adminBadge.innerHTML = '<span class="user-badge">管理員</span>';
+                    adminBtn.style.display = 'block';
                 } else {
-                    adminBtn.style.display = 'none';
+                    document.getElementById('user-email').textContent = window.currentUser.email;
                     adminBadge.innerHTML = '';
+                    adminBtn.style.display = 'none';
                 }
             } else {
                 authStatus.style.display = 'block';
@@ -925,7 +947,7 @@
             renderAdminTable();
         }
 
-        // 登入
+        // 一般登入
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('login-email').value;
@@ -972,9 +994,32 @@
             }
         });
 
+        // 管理員登入
+        document.getElementById('admin-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('admin-email').value;
+
+            if (ADMIN_EMAILS.includes(email)) {
+                window.adminUser = email;
+                showAuthSuccess('管理員登入成功！');
+                setTimeout(() => {
+                    closeAuthModal();
+                    updateAuthUI();
+                    switchTab('admin');
+                }, 1500);
+            } else {
+                showAuthError('此邮箱不是授權的管理員');
+            }
+        });
+
         // 登出
         window.logout = async function() {
-            await signOut(auth);
+            if (window.adminUser) {
+                window.adminUser = null;
+            } else {
+                await signOut(auth);
+            }
+            updateAuthUI();
         };
 
         // Auth UI 函數
@@ -988,6 +1033,7 @@
             document.getElementById('auth-success').style.display = 'none';
             document.getElementById('login-form').reset();
             document.getElementById('signup-form').reset();
+            document.getElementById('admin-form').reset();
         };
 
         // 點擊背景關閉 Modal
@@ -1143,7 +1189,9 @@
 
         // 渲染管理員表格
         async function renderAdminTable() {
-            if (!window.currentUser || !ADMIN_EMAILS.includes(window.currentUser.email)) {
+            if (!window.adminUser) {
+                const tbody = document.getElementById('admin-questions-list');
+                tbody.innerHTML = '';
                 return;
             }
 
@@ -1416,26 +1464,6 @@
                 switchTab(e.target.dataset.tab);
             });
         });
-
-        // 過濾標籤樣式修復
-        const style = document.createElement('style');
-        style.textContent = `
-            .filter-tag {
-                padding: 6px 12px;
-                background-color: var(--color-bg);
-                border: 1px solid var(--color-border);
-                border-radius: 8px;
-                font-size: 12px;
-                cursor: pointer;
-            }
-
-            .filter-tag.active {
-                background-color: var(--color-primary);
-                color: var(--color-white);
-                border-color: var(--color-primary);
-            }
-        `;
-        document.head.appendChild(style);
 
         // 初始化
         loadQuestions();
