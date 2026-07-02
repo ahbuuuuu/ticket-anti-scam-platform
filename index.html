@@ -3,20 +3,385 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>票務防詐聯防網</title>
-    <link rel="stylesheet" href="/src/styles/global.css">
-    <link rel="stylesheet" href="/src/styles/components.css">
+    <title>🛡️ 票務防詐聯防網</title>
+    <style>
+        :root {
+            --color-primary: #3b82f6;
+            --color-danger: #ef4444;
+            --color-warning: #f59e0b;
+            --color-success: #10b981;
+            --color-white: #ffffff;
+            --color-bg: #f9fafb;
+            --color-border: #e5e7eb;
+            --color-text: #1f2937;
+            --color-text-secondary: #6b7280;
+            --risk-high: #dc2626;
+            --risk-medium: #f59e0b;
+            --risk-low: #10b981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        #app {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background-color: var(--color-white);
+            border-bottom: 1px solid var(--color-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .navbar-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .navbar-logo {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        .navbar-menu {
+            display: flex;
+            gap: 16px;
+        }
+
+        .nav-btn {
+            padding: 8px 16px;
+            border: none;
+            background: none;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-btn:hover {
+            color: var(--color-primary);
+        }
+
+        .nav-btn.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 24px;
+            flex: 1;
+        }
+
+        .tab {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .tab.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .card {
+            background-color: var(--color-white);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--color-border);
+            transition: all 0.2s ease;
+            margin-bottom: 16px;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-color: var(--color-primary);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: var(--color-white);
+        }
+
+        .btn-primary:hover {
+            background-color: #2563eb;
+        }
+
+        .btn-secondary {
+            background-color: var(--color-border);
+            color: var(--color-text);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            margin-left: 8px;
+        }
+
+        .badge-platform {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--color-primary);
+        }
+
+        .badge-risk-high {
+            background-color: rgba(220, 38, 38, 0.1);
+            color: var(--risk-high);
+        }
+
+        .case-card {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 16px;
+            align-items: start;
+        }
+
+        .case-seller {
+            font-weight: 600;
+            font-size: 18px;
+            color: var(--color-text);
+            margin-bottom: 8px;
+        }
+
+        .case-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .case-risk {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .risk-score {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .risk-high .risk-score {
+            color: var(--risk-high);
+        }
+
+        .risk-medium .risk-score {
+            color: var(--risk-medium);
+        }
+
+        .risk-low .risk-score {
+            color: var(--risk-low);
+        }
+
+        .alert {
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background-color: rgba(6, 182, 212, 0.1);
+            border-color: #06b6d4;
+            color: #0891b2;
+        }
+
+        .alert-warning {
+            background-color: rgba(245, 158, 11, 0.1);
+            border-color: var(--risk-medium);
+            color: #92400e;
+        }
+
+        .alert-danger {
+            background-color: rgba(220, 38, 38, 0.1);
+            border-color: var(--risk-high);
+            color: #7f1d1d;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 8px 16px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .search-filters {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 16px;
+            margin-bottom: 16px;
+        }
+
+        .filter-tag {
+            padding: 6px 12px;
+            background-color: var(--color-bg);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .filter-tag.active {
+            background-color: var(--color-primary);
+            color: var(--color-white);
+            border-color: var(--color-primary);
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--color-text);
+            font-size: 14px;
+        }
+
+        .form-input,
+        .form-textarea,
+        .form-select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 16px;
+        }
+
+        .stat-number {
+            font-size: 40px;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        .stat-label {
+            color: var(--color-text-secondary);
+            font-size: 12px;
+            margin-top: 8px;
+            text-transform: uppercase;
+        }
+
+        @media (max-width: 768px) {
+            .navbar-menu {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .main-container {
+                padding: 16px;
+            }
+
+            .case-card {
+                grid-template-columns: 1fr;
+            }
+
+            .case-risk {
+                flex-direction: row;
+                justify-content: space-between;
+            }
+        }
+    </style>
 </head>
 <body>
     <div id="app">
         <!-- 導航欄 -->
         <nav class="navbar">
             <div class="navbar-container">
-                <div class="navbar-logo">
-                    🛡️ 防詐平台
-                </div>
+                <div class="navbar-logo">🛡️ 防詐平台</div>
                 <div class="navbar-menu">
-                    <button class="nav-btn" data-tab="dashboard">🏠 首頁</button>
+                    <button class="nav-btn active" data-tab="dashboard">🏠 首頁</button>
                     <button class="nav-btn" data-tab="search">🔍 搜尋</button>
                     <button class="nav-btn" data-tab="report">➕ 回報</button>
                     <button class="nav-btn" data-tab="profile">👤 我的</button>
@@ -26,36 +391,416 @@
 
         <!-- 主容器 -->
         <main class="main-container">
-            <!-- Dashboard -->
+            <!-- 首頁 -->
             <section id="dashboard" class="tab active">
-                <div id="dashboard-content">
-                    <!-- 由 dashboard.js 動態渲染 -->
+                <div style="margin-bottom: 32px;">
+                    <h1 style="font-size: 28px; font-weight: 700; margin-bottom: 8px;">
+                        🛡️ 歡迎使用票務防詐平台
+                    </h1>
+                    <p style="color: #6b7280; font-size: 16px;">
+                        由社群共同維護的演唱會票務詐騙情報交換平台
+                    </p>
+                </div>
+
+                <!-- 統計卡片 -->
+                <div class="stats-grid">
+                    <div class="card" style="text-align: center;">
+                        <p class="stat-label">總案件數</p>
+                        <p class="stat-number" style="color: #3b82f6;">6</p>
+                    </div>
+                    <div class="card" style="text-align: center;">
+                        <p class="stat-label">極高風險</p>
+                        <p class="stat-number" style="color: #ef4444;">4</p>
+                    </div>
+                    <div class="card" style="text-align: center;">
+                        <p class="stat-label">中等風險</p>
+                        <p class="stat-number" style="color: #f59e0b;">1</p>
+                    </div>
+                    <div class="card" style="text-align: center;">
+                        <p class="stat-label">低風險</p>
+                        <p class="stat-number" style="color: #10b981;">1</p>
+                    </div>
+                </div>
+
+                <!-- 公告 -->
+                <div class="alert alert-info">
+                    <strong>📢 平台公告</strong>
+                    <p style="margin-top: 8px; font-size: 14px;">
+                        本平台致力於建立一個透明、可信的票務詐騙情報交換平台。所有案件資訊由社群共同驗證。
+                    </p>
+                </div>
+
+                <!-- 熱門案件 -->
+                <div style="margin-bottom: 32px;">
+                    <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 16px;">🔥 熱門案件</h2>
+                    <div id="dashboard-cases"></div>
                 </div>
             </section>
 
             <!-- 搜尋 -->
             <section id="search" class="tab">
-                <div id="search-content">
-                    <!-- 由 search.js 動態渲染 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h1 class="card-title">🔍 搜尋詐騙案件</h1>
+                    </div>
+
+                    <div class="search-box">
+                        <input 
+                            type="text" 
+                            id="search-input" 
+                            class="search-input" 
+                            placeholder="搜尋賣家ID、Email、Wallet..."
+                        >
+                        <button class="btn btn-primary" id="search-btn">搜尋</button>
+                    </div>
+
+                    <div class="search-filters">
+                        <button class="filter-tag active" data-filter="platform" data-value="">全部平台</button>
+                        <button class="filter-tag" data-filter="platform" data-value="Threads">Threads</button>
+                        <button class="filter-tag" data-filter="platform" data-value="Facebook">Facebook</button>
+                        <button class="filter-tag" data-filter="platform" data-value="Instagram">Instagram</button>
+                        <button class="filter-tag" data-filter="platform" data-value="Telegram">Telegram</button>
+                        <button class="filter-tag" data-filter="platform" data-value="LINE">LINE</button>
+                    </div>
                 </div>
+
+                <div id="search-results"></div>
             </section>
 
             <!-- 回報 -->
             <section id="report" class="tab">
-                <div id="report-content">
-                    <!-- 由 report.js 動態渲染 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h1 class="card-title">➕ 回報詐騙案件</h1>
+                    </div>
+
+                    <div style="margin-bottom: 24px;">
+                        <p style="color: #6b7280;">
+                            您可以報告<strong>疑似詐騙</strong>或<strong>已受害</strong>。提供詳細資訊和證據能幫助更多人避免被騙。
+                        </p>
+                    </div>
+
+                    <form id="report-form">
+                        <div class="form-group">
+                            <label class="form-label">🔴 報告類型 *</label>
+                            <div style="display: flex; gap: 16px;">
+                                <label style="display: flex; align-items: center; cursor: pointer;">
+                                    <input type="radio" name="report_type" value="suspected" checked>
+                                    <span style="margin-left: 8px;">疑似詐騙</span>
+                                </label>
+                                <label style="display: flex; align-items: center; cursor: pointer;">
+                                    <input type="radio" name="report_type" value="victim">
+                                    <span style="margin-left: 8px;">已受害</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">💼 賣家識別 *</label>
+                            <input type="text" id="seller_id" class="form-input" placeholder="例：@scammer_threads" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">📱 平台 *</label>
+                            <select id="platform" class="form-select" required>
+                                <option value="">-- 選擇平台 --</option>
+                                <option value="Threads">Threads</option>
+                                <option value="Facebook">Facebook</option>
+                                <option value="Instagram">Instagram</option>
+                                <option value="Telegram">Telegram</option>
+                                <option value="LINE">LINE</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">📝 詳細描述 *</label>
+                            <textarea id="description" class="form-textarea" placeholder="請詳細描述詐騙情況..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">提交回報</button>
+                    </form>
+
+                    <div id="success-message" style="display: none; margin-top: 16px;">
+                        <div class="alert alert-info">
+                            <strong>✅ 回報成功！</strong>
+                            <p style="margin-top: 8px;">感謝您的貢獻。案件已提交社群驗證。</p>
+                        </div>
+                    </div>
                 </div>
             </section>
 
             <!-- 個人資料 -->
             <section id="profile" class="tab">
-                <div id="profile-content">
-                    <!-- 由 profile.js 動態渲染 -->
+                <div class="card" style="max-width: 400px; margin: 0 auto; margin-top: 32px;">
+                    <div class="card-header">
+                        <h1 class="card-title">👤 登入帳戶</h1>
+                    </div>
+
+                    <div class="alert alert-info" style="margin-bottom: 24px;">
+                        <strong>為什麼需要登入？</strong>
+                        <p style="margin-top: 8px; font-size: 14px;">
+                            登入幫助我們建立社群信任度機制。您的貢獻將累積信譽積分。
+                        </p>
+                    </div>
+
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label class="form-label">📧 Email</label>
+                            <input type="email" id="login-email" class="form-input" placeholder="your@email.com" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">🔐 密碼</label>
+                            <input type="password" id="login-password" class="form-input" placeholder="••••••••" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">登入</button>
+                    </form>
+
+                    <div style="text-align: center; margin-top: 16px;">
+                        <p style="font-size: 14px; color: #6b7280;">
+                            還沒有帳戶？<a href="#" style="color: #3b82f6; text-decoration: none;">立即註冊</a>
+                        </p>
+                    </div>
                 </div>
             </section>
         </main>
     </div>
 
-    <script type="module" src="/src/main.js"></script>
+    <script>
+        // Mock 數據
+        const mockCases = [
+            {
+                id: "case_001",
+                seller_id: "@scammer_threads",
+                platform: "Threads",
+                email: "scammer***@gmail.com",
+                wallet: "0x1234...5678",
+                description: "售出演唱會門票後消失，未提供電子票證",
+                status: "high_risk",
+                risk_score: 92,
+                evidence_count: 8,
+                votes: 15,
+                created_at: "2024-06-01T10:30:00Z"
+            },
+            {
+                id: "case_002",
+                seller_id: "@facebook_ticket",
+                platform: "Facebook",
+                email: "ticket***@yahoo.com",
+                description: "接收款項後發送假電子票，聯絡不上",
+                status: "high_risk",
+                risk_score: 88,
+                evidence_count: 12,
+                votes: 22,
+                created_at: "2024-06-05T15:45:00Z"
+            },
+            {
+                id: "case_003",
+                seller_id: "@telegram_seller",
+                platform: "Telegram",
+                phone: "098***5432",
+                description: "多人反映同一問題，疑似專業詐騙團伙",
+                status: "high_risk",
+                risk_score: 95,
+                evidence_count: 15,
+                votes: 28,
+                created_at: "2024-06-10T08:20:00Z"
+            },
+            {
+                id: "case_004",
+                seller_id: "@instagram_ticket",
+                platform: "Instagram",
+                email: "ticket***@outlook.com",
+                description: "提供的二維碼無效，不回應私訊",
+                status: "medium_risk",
+                risk_score: 65,
+                evidence_count: 5,
+                votes: 8,
+                created_at: "2024-06-12T12:00:00Z"
+            },
+            {
+                id: "case_005",
+                seller_id: "@line_seller",
+                platform: "LINE",
+                wallet: "0x9876...5432",
+                description: "收到款後拉黑用戶，警方已立案",
+                status: "high_risk",
+                risk_score: 98,
+                evidence_count: 20,
+                votes: 35,
+                created_at: "2024-06-08T14:30:00Z"
+            },
+            {
+                id: "case_006",
+                seller_id: "@verified_seller",
+                platform: "Threads",
+                email: "seller***@gmail.com",
+                description: "雖有投訴但經驗證確實提供真票",
+                status: "low_risk",
+                risk_score: 28,
+                evidence_count: 6,
+                votes: 3,
+                created_at: "2024-06-14T09:15:00Z"
+            }
+        ];
+
+        // 函數：渲染案件卡片
+        function renderCaseCard(caseData) {
+            const getRiskClass = (status) => {
+                if (status.includes('high')) return 'risk-high';
+                if (status.includes('medium')) return 'risk-medium';
+                return 'risk-low';
+            };
+
+            const getRiskText = (status) => {
+                const map = {
+                    'high_risk': '🔴 極高風險',
+                    'medium_risk': '🟡 中等風險',
+                    'low_risk': '🟢 低風險'
+                };
+                return map[status] || '未知';
+            };
+
+            return `
+                <div class="card case-card" data-case-id="${caseData.id}">
+                    <div>
+                        <div class="case-seller">
+                            ${caseData.seller_id}
+                            <span class="badge badge-platform">${caseData.platform}</span>
+                        </div>
+                        <div class="case-meta">
+                            <span>📅 ${new Date(caseData.created_at).toLocaleDateString('zh-Hant')}</span>
+                            <span>${caseData.evidence_count} 份證據</span>
+                            <span>${caseData.votes} 票</span>
+                        </div>
+                        <p style="color: #6b7280; margin-bottom: 8px; font-size: 14px;">
+                            ${caseData.description.substring(0, 100)}${caseData.description.length > 100 ? '...' : ''}
+                        </p>
+                    </div>
+                    <div class="case-risk ${getRiskClass(caseData.status)}">
+                        <div class="risk-score">${caseData.risk_score}</div>
+                        <div style="font-size: 12px;">/100</div>
+                        <div style="font-size: 12px; margin-top: 4px; text-align: center;">
+                            ${getRiskText(caseData.status)}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 初始化首頁
+        function initDashboard() {
+            const container = document.getElementById('dashboard-cases');
+            const popularCases = mockCases.slice(0, 3);
+            container.innerHTML = popularCases.map(c => renderCaseCard(c)).join('');
+        }
+
+        // 搜尋功能
+        function initSearch() {
+            const searchBtn = document.getElementById('search-btn');
+            const searchInput = document.getElementById('search-input');
+
+            searchBtn.addEventListener('click', performSearch);
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') performSearch();
+            });
+
+            document.querySelectorAll('[data-filter="platform"]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('[data-filter="platform"]').forEach(b => {
+                        b.classList.remove('active');
+                    });
+                    btn.classList.add('active');
+                    performSearch();
+                });
+            });
+        }
+
+        function performSearch() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const activeFilter = document.querySelector('[data-filter="platform"].active');
+            const platform = activeFilter?.dataset.value || '';
+
+            let results = mockCases.filter(c => {
+                const matchesQuery = !query || 
+                    c.seller_id.toLowerCase().includes(query) ||
+                    c.email?.toLowerCase().includes(query) ||
+                    c.wallet?.toLowerCase().includes(query) ||
+                    c.description.toLowerCase().includes(query);
+                
+                const matchesPlatform = !platform || c.platform === platform;
+                
+                return matchesQuery && matchesPlatform;
+            });
+
+            const container = document.getElementById('search-results');
+            if (results.length === 0) {
+                container.innerHTML = '<div class="alert alert-info">找不到相符的案件。</div>';
+            } else {
+                container.innerHTML = `
+                    <p style="color: #6b7280; margin-bottom: 16px; margin-top: 16px;">
+                        找到 <strong>${results.length}</strong> 個結果
+                    </p>
+                    <div style="display: grid; gap: 16px;">
+                        ${results.map(c => renderCaseCard(c)).join('')}
+                    </div>
+                `;
+            }
+        }
+
+        // 回報表單
+        document.getElementById('report-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const newCase = {
+                id: `case_${Date.now()}`,
+                seller_id: formData.get('seller_id'),
+                platform: formData.get('platform'),
+                description: formData.get('description'),
+                status: 'pending',
+                risk_score: 50,
+                evidence_count: 0,
+                votes: 0,
+                created_at: new Date().toISOString()
+            };
+
+            mockCases.push(newCase);
+
+            document.getElementById('report-form').style.display = 'none';
+            document.getElementById('success-message').style.display = 'block';
+
+            setTimeout(() => {
+                document.getElementById('report-form').style.display = 'block';
+                document.getElementById('success-message').style.display = 'none';
+                document.getElementById('report-form').reset();
+            }, 3000);
+        });
+
+        // 登入表單
+        document.getElementById('login-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('演示版本：登入成功！\n（此為 Mock 演示，實際開發時連接真實認證系統）');
+            e.target.reset();
+        });
+
+        // 導航功能
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const tabId = e.target.dataset.tab;
+                
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                
+                document.getElementById(tabId).classList.add('active');
+                e.target.classList.add('active');
+            });
+        });
+
+        // 初始化
+        initDashboard();
+        initSearch();
+    </script>
 </body>
 </html>
