@@ -56,6 +56,8 @@
             justify-content: space-between;
             align-items: center;
             width: 100%;
+            flex-wrap: wrap;
+            gap: 16px;
         }
 
         .navbar-logo {
@@ -67,6 +69,7 @@
         .navbar-menu {
             display: flex;
             gap: 16px;
+            flex-wrap: wrap;
         }
 
         .nav-btn {
@@ -75,7 +78,7 @@
             background: none;
             color: var(--color-text-secondary);
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             transition: all 0.2s ease;
             border-bottom: 2px solid transparent;
         }
@@ -171,6 +174,11 @@
             color: var(--color-text);
         }
 
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
         .badge {
             display: inline-block;
             padding: 4px 8px;
@@ -184,11 +192,6 @@
         .badge-platform {
             background-color: rgba(59, 130, 246, 0.1);
             color: var(--color-primary);
-        }
-
-        .badge-risk-high {
-            background-color: rgba(220, 38, 38, 0.1);
-            color: var(--risk-high);
         }
 
         .case-card {
@@ -261,6 +264,12 @@
             background-color: rgba(220, 38, 38, 0.1);
             border-color: var(--risk-high);
             color: #7f1d1d;
+        }
+
+        .alert-success {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-color: var(--risk-low);
+            color: #065f46;
         }
 
         .search-box {
@@ -353,10 +362,155 @@
             text-transform: uppercase;
         }
 
+        /* 詢問區樣式 */
+        .question-card {
+            border-left: 4px solid var(--color-primary);
+            padding: 16px;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .question-seller {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--color-text);
+        }
+
+        .question-platform {
+            display: inline-block;
+            margin-left: 8px;
+        }
+
+        .question-content {
+            margin: 12px 0;
+            padding: 12px;
+            background-color: var(--color-bg);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .vote-section {
+            display: flex;
+            gap: 8px;
+            margin: 12px 0;
+            flex-wrap: wrap;
+        }
+
+        .vote-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--color-border);
+            background-color: var(--color-white);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+
+        .vote-btn:hover {
+            background-color: var(--color-bg);
+        }
+
+        .vote-btn.scam {
+            color: var(--risk-high);
+            border-color: var(--risk-high);
+        }
+
+        .vote-btn.scam.voted {
+            background-color: rgba(220, 38, 38, 0.1);
+        }
+
+        .vote-btn.safe {
+            color: var(--risk-low);
+            border-color: var(--risk-low);
+        }
+
+        .vote-btn.safe.voted {
+            background-color: rgba(16, 185, 129, 0.1);
+        }
+
+        .vote-btn.unsure {
+            color: var(--risk-medium);
+            border-color: var(--risk-medium);
+        }
+
+        .vote-btn.unsure.voted {
+            background-color: rgba(245, 158, 11, 0.1);
+        }
+
+        .vote-count {
+            display: inline-block;
+            margin-left: 4px;
+            font-weight: 600;
+        }
+
+        .comments-section {
+            margin-top: 12px;
+            border-top: 1px solid var(--color-border);
+            padding-top: 12px;
+        }
+
+        .comment {
+            margin-bottom: 12px;
+            padding: 12px;
+            background-color: var(--color-bg);
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .comment-time {
+            font-size: 11px;
+            color: var(--color-text-secondary);
+        }
+
+        .comment-text {
+            margin-top: 6px;
+        }
+
+        .comment-form {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .comment-input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 13px;
+            font-family: inherit;
+        }
+
+        .comment-btn {
+            padding: 8px 12px;
+            background-color: var(--color-primary);
+            color: var(--color-white);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
         @media (max-width: 768px) {
             .navbar-menu {
                 flex-direction: column;
                 gap: 8px;
+                width: 100%;
+            }
+
+            .nav-btn {
+                font-size: 12px;
+                padding: 6px 12px;
             }
 
             .main-container {
@@ -383,6 +537,7 @@
                 <div class="navbar-menu">
                     <button class="nav-btn active" data-tab="dashboard">🏠 首頁</button>
                     <button class="nav-btn" data-tab="search">🔍 搜尋</button>
+                    <button class="nav-btn" data-tab="questions">❓ 詢問區</button>
                     <button class="nav-btn" data-tab="report">➕ 回報</button>
                     <button class="nav-btn" data-tab="profile">👤 我的</button>
                 </div>
@@ -409,16 +564,12 @@
                         <p class="stat-number" style="color: #3b82f6;">6</p>
                     </div>
                     <div class="card" style="text-align: center;">
+                        <p class="stat-label">待審詢問</p>
+                        <p class="stat-number" style="color: #f59e0b;" id="questions-count">0</p>
+                    </div>
+                    <div class="card" style="text-align: center;">
                         <p class="stat-label">極高風險</p>
                         <p class="stat-number" style="color: #ef4444;">4</p>
-                    </div>
-                    <div class="card" style="text-align: center;">
-                        <p class="stat-label">中等風險</p>
-                        <p class="stat-number" style="color: #f59e0b;">1</p>
-                    </div>
-                    <div class="card" style="text-align: center;">
-                        <p class="stat-label">低風險</p>
-                        <p class="stat-number" style="color: #10b981;">1</p>
                     </div>
                 </div>
 
@@ -426,14 +577,69 @@
                 <div class="alert alert-info">
                     <strong>📢 平台公告</strong>
                     <p style="margin-top: 8px; font-size: 14px;">
-                        本平台致力於建立一個透明、可信的票務詐騙情報交換平台。所有案件資訊由社群共同驗證。
+                        本平台致力於建立一個透明、可信的票務詐騙情報交換平台。在詢問區發問，社群會幫你判斷真偽！
                     </p>
                 </div>
 
-                <!-- 熱門案件 -->
+                <!-- 最新詢問 -->
                 <div style="margin-bottom: 32px;">
-                    <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 16px;">🔥 熱門案件</h2>
-                    <div id="dashboard-cases"></div>
+                    <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 16px;">❓ 最新詢問</h2>
+                    <div id="dashboard-questions"></div>
+                </div>
+            </section>
+
+            <!-- 詢問區 -->
+            <section id="questions" class="tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h1 class="card-title">❓ 社群詢問區</h1>
+                    </div>
+
+                    <div class="alert alert-info" style="margin-bottom: 24px;">
+                        <strong>👥 如何使用</strong>
+                        <p style="margin-top: 8px; font-size: 14px;">
+                            遇到可疑的賣家？在這裡發問，社群會幫你一起判斷！其他用戶可以投票和留言討論。
+                        </p>
+                    </div>
+
+                    <form id="question-form">
+                        <div class="form-group">
+                            <label class="form-label">💼 賣家帳號或ID *</label>
+                            <input type="text" id="question-seller" class="form-input" placeholder="例：@scammer_threads" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">📱 平台 *</label>
+                            <select id="question-platform" class="form-select" required>
+                                <option value="">-- 選擇平台 --</option>
+                                <option value="Threads">Threads</option>
+                                <option value="Facebook">Facebook</option>
+                                <option value="Instagram">Instagram</option>
+                                <option value="Telegram">Telegram</option>
+                                <option value="LINE">LINE</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">📝 售票文或詳細情況 *</label>
+                            <textarea id="question-content" class="form-textarea" placeholder="貼上售票文、截圖文字、或詳細描述..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">發布詢問</button>
+                    </form>
+
+                    <div id="question-success" style="display: none; margin-top: 16px;">
+                        <div class="alert alert-success">
+                            <strong>✅ 詢問已發布！</strong>
+                            <p style="margin-top: 8px;">社群成員會幫你一起判斷。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 詢問列表 -->
+                <div style="margin-top: 32px;">
+                    <h2 style="font-size: 20px; font-weight: 600; margin-bottom: 16px;">最新詢問</h2>
+                    <div id="questions-list"></div>
                 </div>
             </section>
 
@@ -476,25 +682,11 @@
 
                     <div style="margin-bottom: 24px;">
                         <p style="color: #6b7280;">
-                            您可以報告<strong>疑似詐騙</strong>或<strong>已受害</strong>。提供詳細資訊和證據能幫助更多人避免被騙。
+                            確定被詐騙了？在這裡回報。提供詳細資訊和證據能幫助更多人避免被騙。
                         </p>
                     </div>
 
                     <form id="report-form">
-                        <div class="form-group">
-                            <label class="form-label">🔴 報告類型 *</label>
-                            <div style="display: flex; gap: 16px;">
-                                <label style="display: flex; align-items: center; cursor: pointer;">
-                                    <input type="radio" name="report_type" value="suspected" checked>
-                                    <span style="margin-left: 8px;">疑似詐騙</span>
-                                </label>
-                                <label style="display: flex; align-items: center; cursor: pointer;">
-                                    <input type="radio" name="report_type" value="victim">
-                                    <span style="margin-left: 8px;">已受害</span>
-                                </label>
-                            </div>
-                        </div>
-
                         <div class="form-group">
                             <label class="form-label">💼 賣家識別 *</label>
                             <input type="text" id="seller_id" class="form-input" placeholder="例：@scammer_threads" required>
@@ -521,7 +713,7 @@
                     </form>
 
                     <div id="success-message" style="display: none; margin-top: 16px;">
-                        <div class="alert alert-info">
+                        <div class="alert alert-success">
                             <strong>✅ 回報成功！</strong>
                             <p style="margin-top: 8px;">感謝您的貢獻。案件已提交社群驗證。</p>
                         </div>
@@ -645,6 +837,9 @@
             }
         ];
 
+        // 詢問數據
+        let questions = [];
+
         // 函數：渲染案件卡片
         function renderCaseCard(caseData) {
             const getRiskClass = (status) => {
@@ -687,6 +882,138 @@
                     </div>
                 </div>
             `;
+        }
+
+        // 函數：渲染詢問卡片
+        function renderQuestionCard(question) {
+            const getConsensus = (scamVotes, safeVotes, unsureVotes) => {
+                const total = scamVotes + safeVotes + unsureVotes;
+                if (total === 0) return '⏳ 等待投票';
+                if (scamVotes > safeVotes && scamVotes > unsureVotes) return '🔴 可能詐騙';
+                if (safeVotes > scamVotes && safeVotes > unsureVotes) return '🟢 應該安全';
+                return '🟡 意見不一';
+            };
+
+            return `
+                <div class="card question-card" data-question-id="${question.id}">
+                    <div class="question-header">
+                        <div>
+                            <div class="question-seller">
+                                ${question.seller_id}
+                                <span class="badge badge-platform question-platform">${question.platform}</span>
+                            </div>
+                            <div class="case-meta" style="margin-top: 8px;">
+                                <span>💬 ${(question.comments || []).length} 則留言</span>
+                                <span>📅 ${new Date(question.created_at).toLocaleDateString('zh-Hant')}</span>
+                            </div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-weight: 600; color: var(--color-text);">
+                                ${getConsensus(question.scamVotes || 0, question.safeVotes || 0, question.unsureVotes || 0)}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="question-content">
+                        ${question.content.substring(0, 200)}${question.content.length > 200 ? '...' : ''}
+                    </div>
+
+                    <div class="vote-section">
+                        <button class="vote-btn scam ${question.userVote === 'scam' ? 'voted' : ''}" onclick="voteQuestion('${question.id}', 'scam')">
+                            🔴 詐騙 <span class="vote-count">${question.scamVotes || 0}</span>
+                        </button>
+                        <button class="vote-btn safe ${question.userVote === 'safe' ? 'voted' : ''}" onclick="voteQuestion('${question.id}', 'safe')">
+                            🟢 安全 <span class="vote-count">${question.safeVotes || 0}</span>
+                        </button>
+                        <button class="vote-btn unsure ${question.userVote === 'unsure' ? 'voted' : ''}" onclick="voteQuestion('${question.id}', 'unsure')">
+                            🟡 不確定 <span class="vote-count">${question.unsureVotes || 0}</span>
+                        </button>
+                    </div>
+
+                    <div class="comments-section">
+                        <div style="font-weight: 600; margin-bottom: 8px;">💬 留言 (${(question.comments || []).length})</div>
+                        
+                        <div class="comment-form">
+                            <input type="text" class="comment-input" placeholder="寫下你的看法..." onkeypress="handleCommentKeypress(event, '${question.id}')">
+                            <button class="comment-btn" onclick="addComment('${question.id}')">發送</button>
+                        </div>
+
+                        <div style="margin-top: 12px;">
+                            ${(question.comments || []).map((comment, idx) => `
+                                <div class="comment">
+                                    <div class="comment-author">${comment.author}</div>
+                                    <div class="comment-time">${new Date(comment.time).toLocaleString('zh-Hant')}</div>
+                                    <div class="comment-text">${comment.text}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 投票函數
+        function voteQuestion(questionId, voteType) {
+            const question = questions.find(q => q.id === questionId);
+            if (!question) return;
+
+            question.userVote = question.userVote === voteType ? null : voteType;
+            if (voteType === 'scam') question.scamVotes = (question.scamVotes || 0) + (question.userVote ? 1 : -1);
+            if (voteType === 'safe') question.safeVotes = (question.safeVotes || 0) + (question.userVote ? 1 : -1);
+            if (voteType === 'unsure') question.unsureVotes = (question.unsureVotes || 0) + (question.userVote ? 1 : -1);
+
+            renderQuestionsList();
+        }
+
+        // 添加留言函數
+        function addComment(questionId) {
+            const question = questions.find(q => q.id === questionId);
+            if (!question) return;
+
+            const input = document.querySelector(`[data-question-id="${questionId}"] .comment-input`);
+            const text = input.value.trim();
+            
+            if (!text) {
+                alert('請輸入留言內容');
+                return;
+            }
+
+            if (!question.comments) question.comments = [];
+            question.comments.push({
+                author: '訪客' + Math.floor(Math.random() * 1000),
+                time: new Date().toISOString(),
+                text: text
+            });
+
+            input.value = '';
+            renderQuestionsList();
+        }
+
+        function handleCommentKeypress(event, questionId) {
+            if (event.key === 'Enter') {
+                addComment(questionId);
+            }
+        }
+
+        // 渲染詢問列表
+        function renderQuestionsList() {
+            const container = document.getElementById('questions-list');
+            if (questions.length === 0) {
+                container.innerHTML = '<div class="alert alert-info">還沒有詢問。成為第一個提出問題的人吧！</div>';
+            } else {
+                container.innerHTML = questions.map(q => renderQuestionCard(q)).join('');
+            }
+
+            // 更新統計
+            document.getElementById('questions-count').textContent = questions.length;
+
+            // 更新首頁
+            const dashboardContainer = document.getElementById('dashboard-questions');
+            if (questions.length === 0) {
+                dashboardContainer.innerHTML = '<div class="alert alert-info">還沒有詢問</div>';
+            } else {
+                dashboardContainer.innerHTML = questions.slice(0, 2).map(q => renderQuestionCard(q)).join('');
+            }
         }
 
         // 初始化首頁
@@ -749,6 +1076,37 @@
             }
         }
 
+        // 詢問表單
+        document.getElementById('question-form')?.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const newQuestion = {
+                id: `q_${Date.now()}`,
+                seller_id: formData.get('question-seller'),
+                platform: formData.get('question-platform'),
+                content: formData.get('question-content'),
+                scamVotes: 0,
+                safeVotes: 0,
+                unsureVotes: 0,
+                userVote: null,
+                comments: [],
+                created_at: new Date().toISOString()
+            };
+
+            questions.unshift(newQuestion);
+            renderQuestionsList();
+
+            document.getElementById('question-form').style.display = 'none';
+            document.getElementById('question-success').style.display = 'block';
+
+            setTimeout(() => {
+                document.getElementById('question-form').style.display = 'block';
+                document.getElementById('question-success').style.display = 'none';
+                document.getElementById('question-form').reset();
+            }, 3000);
+        });
+
         // 回報表單
         document.getElementById('report-form')?.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -801,6 +1159,7 @@
         // 初始化
         initDashboard();
         initSearch();
+        renderQuestionsList();
     </script>
 </body>
 </html>
