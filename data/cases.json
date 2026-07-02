@@ -1,0 +1,103 @@
+[
+  {
+    "id": "case_001",
+    "seller_id": "@scammer_threads",
+    "platform": "Threads",
+    "email": "scammer***@gmail.com",
+    "wallet": "0x1234...5678",
+    "description": "售出演唱会门票后消失，未提供电子票证",
+    "status": "high_risk",
+    "risk_score": 92,
+    "evidence_count": 8,
+    "votes": 15,
+    "created_at": "2024-06-01T10:30:00Z",
+    "updated_at": "2024-06-15T14:22:00Z",
+    "tags": ["演唱会", "消失"],
+    "related_accounts": [
+      { "platform": "Instagram", "handle": "@similar_name123" },
+      { "platform": "Facebook", "name": "真名账户" }
+    ]
+  },
+  {
+    "id": "case_002",
+    "seller_id": "@facebook_ticket",
+    "platform": "Facebook",
+    "email": "ticket***@yahoo.com",
+    "description": "接收款项后发送假电子票，联系不上",
+    "status": "high_risk",
+    "risk_score": 88,
+    "evidence_count": 12,
+    "votes": 22,
+    "created_at": "2024-06-05T15:45:00Z",
+    "updated_at": "2024-06-20T09:15:00Z",
+    "tags": ["假票", "诈骗"],
+    "related_accounts": [
+      { "platform": "Threads", "handle": "@similar_account" }
+    ]
+  },
+  {
+    "id": "case_003",
+    "seller_id": "@telegram_seller",
+    "platform": "Telegram",
+    "phone": "098***5432",
+    "description": "多人反映同一问题，疑似专业诈骗团伙",
+    "status": "high_risk",
+    "risk_score": 95,
+    "evidence_count": 15,
+    "votes": 28,
+    "created_at": "2024-06-10T08:20:00Z",
+    "updated_at": "2024-06-18T16:30:00Z",
+    "tags": ["团伙", "多人"],
+    "related_accounts": [
+      { "platform": "Telegram", "phone": "098***6543" },
+      { "platform": "Telegram", "phone": "089***1234" }
+    ]
+  },
+  {
+    "id": "case_004",
+    "seller_id": "@instagram_ticket",
+    "platform": "Instagram",
+    "email": "ticket***@outlook.com",
+    "description": "提供的二维码无效，不回应私讯",
+    "status": "medium_risk",
+    "risk_score": 65,
+    "evidence_count": 5,
+    "votes": 8,
+    "created_at": "2024-06-12T12:00:00Z",
+    "updated_at": "2024-06-16T11:45:00Z",
+    "tags": ["假票", "无效"],
+    "related_accounts": []
+  },
+  {
+    "id": "case_005",
+    "seller_id": "@line_seller",
+    "platform": "LINE",
+    "wallet": "0x9876...5432",
+    "description": "收到款后拉黑用户，警方已立案",
+    "status": "high_risk",
+    "risk_score": 98,
+    "evidence_count": 20,
+    "votes": 35,
+    "created_at": "2024-06-08T14:30:00Z",
+    "updated_at": "2024-06-21T10:00:00Z",
+    "tags": ["诈骗", "拉黑", "立案"],
+    "related_accounts": [
+      { "platform": "LINE", "handle": "@backup_account" }
+    ]
+  },
+  {
+    "id": "case_006",
+    "seller_id": "@verified_seller",
+    "platform": "Threads",
+    "email": "seller***@gmail.com",
+    "description": "虽有投诉但经验证确实提供真票，卖家有回应解释",
+    "status": "low_risk",
+    "risk_score": 28,
+    "evidence_count": 6,
+    "votes": 3,
+    "created_at": "2024-06-14T09:15:00Z",
+    "updated_at": "2024-06-20T13:20:00Z",
+    "tags": ["真票", "已解决"],
+    "related_accounts": []
+  }
+]

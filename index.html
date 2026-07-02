@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>票務防詐聯防網</title>
+    <link rel="stylesheet" href="/src/styles/global.css">
+    <link rel="stylesheet" href="/src/styles/components.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 導航欄 -->
+        <nav class="navbar">
+            <div class="navbar-container">
+                <div class="navbar-logo">
+                    🛡️ 防詐平台
+                </div>
+                <div class="navbar-menu">
+                    <button class="nav-btn" data-tab="dashboard">🏠 首頁</button>
+                    <button class="nav-btn" data-tab="search">🔍 搜尋</button>
+                    <button class="nav-btn" data-tab="report">➕ 回報</button>
+                    <button class="nav-btn" data-tab="profile">👤 我的</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 主容器 -->
+        <main class="main-container">
+            <!-- Dashboard -->
+            <section id="dashboard" class="tab active">
+                <div id="dashboard-content">
+                    <!-- 由 dashboard.js 動態渲染 -->
+                </div>
+            </section>
+
+            <!-- 搜尋 -->
+            <section id="search" class="tab">
+                <div id="search-content">
+                    <!-- 由 search.js 動態渲染 -->
+                </div>
+            </section>
+
+            <!-- 回報 -->
+            <section id="report" class="tab">
+                <div id="report-content">
+                    <!-- 由 report.js 動態渲染 -->
+                </div>
+            </section>
+
+            <!-- 個人資料 -->
+            <section id="profile" class="tab">
+                <div id="profile-content">
+                    <!-- 由 profile.js 動態渲染 -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>
