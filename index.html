@@ -93,6 +93,13 @@
             border-bottom-color: var(--color-primary);
         }
 
+        .nav-btn.admin {
+            background-color: #fef3c7;
+            padding: 6px 12px;
+            border-radius: 6px;
+            border-bottom: none;
+        }
+
         .auth-section {
             display: flex;
             gap: 12px;
@@ -103,6 +110,15 @@
         .user-info {
             font-size: 14px;
             color: var(--color-text-secondary);
+        }
+
+        .user-badge {
+            font-size: 11px;
+            background-color: #fef3c7;
+            color: #92400e;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 4px;
         }
 
         .btn-logout {
@@ -199,6 +215,17 @@
             background-color: #cbd5e1;
             cursor: not-allowed;
             transform: none;
+        }
+
+        .btn-danger {
+            background-color: var(--color-danger);
+            color: var(--color-white);
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
         }
 
         .badge {
@@ -310,6 +337,10 @@
             cursor: not-allowed;
         }
 
+        .vote-btn.voted {
+            font-weight: 600;
+        }
+
         .vote-btn.scam { color: var(--risk-high); border-color: var(--risk-high); }
         .vote-btn.scam.voted { background-color: rgba(220, 38, 38, 0.1); }
         .vote-btn.safe { color: var(--risk-low); border-color: var(--risk-low); }
@@ -411,9 +442,29 @@
             right: 16px;
             background: none;
             border: none;
-            font-size: 24px;
+            font-size: 28px;
             cursor: pointer;
             color: var(--color-text-secondary);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background-color: var(--color-bg);
+            border-radius: 6px;
+        }
+
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
         }
 
         .tab-buttons {
@@ -447,7 +498,6 @@
             display: block;
         }
 
-        /* 詢問卡片樣式 */
         .question-card {
             background-color: var(--color-white);
             border-radius: 12px;
@@ -461,10 +511,6 @@
 
         .question-card:hover {
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-color: var(--color-primary);
-        }
-
-        .question-card.expanded {
             border-color: var(--color-primary);
         }
 
@@ -501,51 +547,27 @@
             display: block;
         }
 
-        .expand-btn {
-            padding: 4px 8px;
-            background-color: var(--color-bg);
-            border: 1px solid var(--color-border);
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 12px;
-            white-space: nowrap;
-        }
-
-        .search-box {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
-        }
-
-        .search-input {
-            flex: 1;
-            padding: 8px 16px;
-            border: 1px solid var(--color-border);
-            border-radius: 8px;
-            font-size: 16px;
-        }
-
-        .search-filters {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
             margin-top: 16px;
-            margin-bottom: 16px;
         }
 
-        .filter-tag {
-            padding: 6px 12px;
+        .admin-table th,
+        .admin-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+            font-size: 14px;
+        }
+
+        .admin-table th {
             background-color: var(--color-bg);
-            border: 1px solid var(--color-border);
-            border-radius: 8px;
-            font-size: 12px;
-            cursor: pointer;
+            font-weight: 600;
         }
 
-        .filter-tag.active {
-            background-color: var(--color-primary);
-            color: var(--color-white);
-            border-color: var(--color-primary);
+        .admin-table tr:hover {
+            background-color: var(--color-bg);
         }
 
         @media (max-width: 768px) {
@@ -566,13 +588,14 @@
                     <button class="nav-btn" data-tab="search">🔍 查詢</button>
                     <button class="nav-btn" data-tab="questions">❓ 詢問區</button>
                     <button class="nav-btn" data-tab="report">➕ 回報</button>
+                    <button class="nav-btn admin" id="admin-btn" style="display: none;" data-tab="admin">⚙️ 管理</button>
                     
                     <div class="auth-section">
                         <div id="auth-status">
                             <button class="btn-login" onclick="openAuthModal()">登入/註冊</button>
                         </div>
                         <div id="user-logged" style="display: none;">
-                            <span class="user-info">👤 <span id="user-email"></span></span>
+                            <span class="user-info">👤 <span id="user-email"></span><span id="admin-badge"></span></span>
                             <button class="btn-logout" onclick="window.logout()">登出</button>
                         </div>
                     </div>
@@ -623,12 +646,12 @@
                         <h1 class="card-title">🔍 查詢詐騙案件</h1>
                     </div>
 
-                    <div class="search-box">
-                        <input type="text" id="search-input" class="search-input" placeholder="搜尋賣家ID、平台...">
+                    <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                        <input type="text" id="search-input" class="form-input" placeholder="搜尋賣家ID、平台...">
                         <button class="btn btn-primary" id="search-btn">搜尋</button>
                     </div>
 
-                    <div class="search-filters">
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                         <button class="filter-tag active" data-filter="platform" data-value="">全部平台</button>
                         <button class="filter-tag" data-filter="platform" data-value="Threads">Threads</button>
                         <button class="filter-tag" data-filter="platform" data-value="Facebook">Facebook</button>
@@ -742,6 +765,30 @@
                     </div>
                 </div>
             </section>
+
+            <!-- 管理面板 -->
+            <section id="admin" class="tab">
+                <div class="card">
+                    <div class="card-header">
+                        <h1 class="card-title">⚙️ 管理員面板</h1>
+                    </div>
+
+                    <h3 style="font-weight: 600; margin: 24px 0 16px 0;">📋 所有詢問</h3>
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>賣家</th>
+                                <th>平台</th>
+                                <th>提問者</th>
+                                <th>投票統計</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-questions-list">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
         </main>
     </div>
 
@@ -815,7 +862,7 @@
             signOut,
             onAuthStateChanged
         } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, onSnapshot, query, orderBy, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         // Firebase 配置
         const firebaseConfig = {
@@ -832,9 +879,14 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // 管理員列表 - 可以在這裡添加管理員邮箱
+   const ADMIN_EMAILS = ['4a670040us@gmail.com'];
+
+
         window.questions = [];
         window.currentUser = null;
         window.selectedPlatformFilter = '';
+        window.userVotes = {}; // 追踪用户的投票
 
         // 監聽認證狀態
         onAuthStateChanged(auth, (user) => {
@@ -846,17 +898,31 @@
         function updateAuthUI() {
             const authStatus = document.getElementById('auth-status');
             const userLogged = document.getElementById('user-logged');
+            const adminBtn = document.getElementById('admin-btn');
+            const adminBadge = document.getElementById('admin-badge');
 
             if (window.currentUser) {
                 authStatus.style.display = 'none';
                 userLogged.style.display = 'flex';
                 document.getElementById('user-email').textContent = window.currentUser.email;
+                
+                // 檢查是否是管理員
+                if (ADMIN_EMAILS.includes(window.currentUser.email)) {
+                    adminBtn.style.display = 'block';
+                    adminBadge.innerHTML = '<span class="user-badge">管理員</span>';
+                } else {
+                    adminBtn.style.display = 'none';
+                    adminBadge.innerHTML = '';
+                }
             } else {
                 authStatus.style.display = 'block';
                 userLogged.style.display = 'none';
+                adminBtn.style.display = 'none';
+                adminBadge.innerHTML = '';
             }
 
             renderQuestionsList();
+            renderAdminTable();
         }
 
         // 登入
@@ -924,6 +990,13 @@
             document.getElementById('signup-form').reset();
         };
 
+        // 點擊背景關閉 Modal
+        document.getElementById('auth-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'auth-modal') {
+                closeAuthModal();
+            }
+        });
+
         window.switchAuthTab = function(tab) {
             document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -960,6 +1033,7 @@
                 });
                 
                 renderQuestionsList();
+                renderAdminTable();
                 updateStats();
             });
         }
@@ -976,63 +1050,66 @@
                 return;
             }
 
-            const html = window.questions.map(question => `
-                <div class="question-card" onclick="toggleQuestion(this)">
-                    <div class="question-card-header">
-                        <div style="flex: 1;">
-                            <div class="question-card-title">
-                                ${question.seller_id}
-                                <span class="badge">${question.platform}</span>
-                            </div>
-                            <div class="question-card-meta">
-                                <span>📅 ${question.created_at ? new Date(question.created_at.seconds * 1000).toLocaleDateString('zh-Hant') : '未知'}</span>
-                                <span>提問者: ${question.asker_email || '匿名'}</span>
-                            </div>
-                            <div style="margin-top: 8px; color: #6b7280; font-size: 14px;">
-                                ${question.content.substring(0, 100)}...
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="vote-section" onclick="event.stopPropagation()">
-                        <button class="vote-btn scam" onclick="window.voteQuestion('${question.id}', 'scam')" ${window.currentUser ? '' : 'disabled'} title="${window.currentUser ? '' : '需要登入才能投票'}">
-                            🔴 詐騙 <span>${question.scamVotes || 0}</span>
-                        </button>
-                        <button class="vote-btn safe" onclick="window.voteQuestion('${question.id}', 'safe')" ${window.currentUser ? '' : 'disabled'} title="${window.currentUser ? '' : '需要登入才能投票'}">
-                            🟢 安全 <span>${question.safeVotes || 0}</span>
-                        </button>
-                        <button class="vote-btn unsure" onclick="window.voteQuestion('${question.id}', 'unsure')" ${window.currentUser ? '' : 'disabled'} title="${window.currentUser ? '' : '需要登入才能投票'}">
-                            🟡 不確定 <span>${question.unsureVotes || 0}</span>
-                        </button>
-                    </div>
-
-                    <div class="question-card-content" onclick="event.stopPropagation()">
-                        <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--color-border);">
-                            <p style="font-weight: 600; margin-bottom: 8px;">完整詢問：</p>
-                            <p style="color: #6b7280; line-height: 1.6;">
-                                ${question.content}
-                            </p>
-                        </div>
-
-                        <div style="font-weight: 600; margin-bottom: 8px;">💬 留言 (${(question.comments || []).length})</div>
-                        
-                        <div class="comment-form">
-                            <input type="text" class="comment-input" placeholder="寫下你的看法..." onkeypress="if(event.key==='Enter') window.addComment('${question.id}')" ${window.currentUser ? '' : 'disabled'}>
-                            <button class="comment-btn" onclick="window.addComment('${question.id}')" ${window.currentUser ? '' : 'disabled'}>發送</button>
-                        </div>
-
-                        <div style="margin-top: 12px;">
-                            ${(question.comments || []).map(comment => `
-                                <div class="comment">
-                                    <div class="comment-author">${comment.author}</div>
-                                    <div class="comment-time">${comment.time}</div>
-                                    <div style="margin-top: 6px;">${comment.text}</div>
+            const html = window.questions.map(question => {
+                const hasVoted = question.voters && window.currentUser && question.voters.includes(window.currentUser.email);
+                return `
+                    <div class="question-card" onclick="toggleQuestion(this)">
+                        <div class="question-card-header">
+                            <div style="flex: 1;">
+                                <div class="question-card-title">
+                                    ${question.seller_id}
+                                    <span class="badge">${question.platform}</span>
                                 </div>
-                            `).join('')}
+                                <div class="question-card-meta">
+                                    <span>📅 ${question.created_at ? new Date(question.created_at.seconds * 1000).toLocaleDateString('zh-Hant') : '未知'}</span>
+                                    <span>提問者: ${question.asker_email || '匿名'}</span>
+                                </div>
+                                <div style="margin-top: 8px; color: #6b7280; font-size: 14px;">
+                                    ${question.content.substring(0, 100)}...
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="vote-section" onclick="event.stopPropagation()">
+                            <button class="vote-btn scam ${hasVoted ? 'voted' : ''}" onclick="window.voteQuestion('${question.id}', 'scam')" ${window.currentUser ? '' : 'disabled'} title="${window.currentUser ? (hasVoted ? '已投票' : '點擊投票') : '需要登入才能投票'}">
+                                🔴 詐騙 <span>${question.scamVotes || 0}</span>
+                            </button>
+                            <button class="vote-btn safe ${hasVoted ? 'voted' : ''}" onclick="window.voteQuestion('${question.id}', 'safe')" ${window.currentUser ? '' : 'disabled'} title="${window.currentUser ? (hasVoted ? '已投票' : '點擊投票') : '需要登入才能投票'}">
+                                🟢 安全 <span>${question.safeVotes || 0}</span>
+                            </button>
+                            <button class="vote-btn unsure ${hasVoted ? 'voted' : ''}" onclick="window.voteQuestion('${question.id}', 'unsure')" ${window.currentUser ? '' : 'disabled'} title="${window.currentUser ? (hasVoted ? '已投票' : '點擊投票') : '需要登入才能投票'}">
+                                🟡 不確定 <span>${question.unsureVotes || 0}</span>
+                            </button>
+                        </div>
+
+                        <div class="question-card-content" onclick="event.stopPropagation()">
+                            <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--color-border);">
+                                <p style="font-weight: 600; margin-bottom: 8px;">完整詢問：</p>
+                                <p style="color: #6b7280; line-height: 1.6;">
+                                    ${question.content}
+                                </p>
+                            </div>
+
+                            <div style="font-weight: 600; margin-bottom: 8px;">💬 留言 (${(question.comments || []).length})</div>
+                            
+                            <div class="comment-form">
+                                <input type="text" class="comment-input" placeholder="寫下你的看法..." onkeypress="if(event.key==='Enter') window.addComment('${question.id}')" ${window.currentUser ? '' : 'disabled'}>
+                                <button class="comment-btn" onclick="window.addComment('${question.id}')" ${window.currentUser ? '' : 'disabled'}>發送</button>
+                            </div>
+
+                            <div style="margin-top: 12px;">
+                                ${(question.comments || []).map(comment => `
+                                    <div class="comment">
+                                        <div class="comment-author">${comment.author}</div>
+                                        <div class="comment-time">${comment.time}</div>
+                                        <div style="margin-top: 6px;">${comment.text}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
 
             container.innerHTML = html;
             
@@ -1064,6 +1141,41 @@
             element.classList.toggle('expanded');
         };
 
+        // 渲染管理員表格
+        async function renderAdminTable() {
+            if (!window.currentUser || !ADMIN_EMAILS.includes(window.currentUser.email)) {
+                return;
+            }
+
+            const tbody = document.getElementById('admin-questions-list');
+            
+            const html = window.questions.map(question => `
+                <tr>
+                    <td>${question.seller_id}</td>
+                    <td>${question.platform}</td>
+                    <td>${question.asker_email || '匿名'}</td>
+                    <td>🔴${question.scamVotes || 0} 🟢${question.safeVotes || 0} 🟡${question.unsureVotes || 0}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="window.deleteQuestion('${question.id}')">刪除</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            tbody.innerHTML = html;
+        }
+
+        // 刪除詢問
+        window.deleteQuestion = async function(questionId) {
+            if (!confirm('確認要刪除這個詢問嗎？')) return;
+
+            try {
+                await deleteDoc(doc(db, "questions", questionId));
+                alert('已刪除');
+            } catch (error) {
+                alert('刪除失敗：' + error.message);
+            }
+        };
+
         // 發布問題
         document.getElementById('question-form').addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1077,6 +1189,7 @@
                     scamVotes: 0,
                     safeVotes: 0,
                     unsureVotes: 0,
+                    voters: [],
                     comments: [],
                     created_at: new Date()
                 });
@@ -1095,7 +1208,7 @@
             }
         });
 
-        // 投票函數
+        // 投票函數 - 一個用戶只能投票一次
         window.voteQuestion = async function(questionId, voteType) {
             if (!window.currentUser) {
                 alert('需要登入才能投票');
@@ -1106,6 +1219,12 @@
             const question = window.questions.find(q => q.id === questionId);
             if (!question) return;
 
+            // 檢查用戶是否已投票
+            if (question.voters && question.voters.includes(window.currentUser.email)) {
+                alert('你已經投過票了，每個人只能投票一次');
+                return;
+            }
+
             try {
                 const questionRef = doc(db, "questions", questionId);
                 const updateData = {};
@@ -1114,9 +1233,15 @@
                 if (voteType === 'safe') updateData.safeVotes = (question.safeVotes || 0) + 1;
                 if (voteType === 'unsure') updateData.unsureVotes = (question.unsureVotes || 0) + 1;
 
+                // 添加用戶到投票者列表
+                const voters = question.voters || [];
+                voters.push(window.currentUser.email);
+                updateData.voters = voters;
+
                 await updateDoc(questionRef, updateData);
             } catch (error) {
                 console.error("投票失敗:", error);
+                alert('投票失敗：' + error.message);
             }
         };
 
@@ -1131,7 +1256,6 @@
             const question = window.questions.find(q => q.id === questionId);
             if (!question) return;
 
-            const input = document.querySelector(`[onclick="toggleQuestion(this)"] .comment-input`);
             const inputs = document.querySelectorAll('.comment-input');
             let text = '';
             
@@ -1198,26 +1322,29 @@
             if (results.length === 0) {
                 container.innerHTML = '<div class="alert alert-info">找不到相符的詢問。</div>';
             } else {
-                const resultHtml = results.map(question => `
-                    <div class="question-card" onclick="toggleQuestion(this)">
-                        <div class="question-card-header">
-                            <div style="flex: 1;">
-                                <div class="question-card-title">
-                                    ${question.seller_id}
-                                    <span class="badge">${question.platform}</span>
-                                </div>
-                                <div style="margin-top: 8px; color: #6b7280; font-size: 14px;">
-                                    ${question.content.substring(0, 100)}...
+                const resultHtml = results.map(question => {
+                    const hasVoted = question.voters && window.currentUser && question.voters.includes(window.currentUser.email);
+                    return `
+                        <div class="question-card" onclick="toggleQuestion(this)">
+                            <div class="question-card-header">
+                                <div style="flex: 1;">
+                                    <div class="question-card-title">
+                                        ${question.seller_id}
+                                        <span class="badge">${question.platform}</span>
+                                    </div>
+                                    <div style="margin-top: 8px; color: #6b7280; font-size: 14px;">
+                                        ${question.content.substring(0, 100)}...
+                                    </div>
                                 </div>
                             </div>
+                            <div class="vote-section" onclick="event.stopPropagation()">
+                                <span style="font-size: 12px;">🔴 詐騙 ${question.scamVotes || 0}</span>
+                                <span style="font-size: 12px;">🟢 安全 ${question.safeVotes || 0}</span>
+                                <span style="font-size: 12px;">🟡 不確定 ${question.unsureVotes || 0}</span>
+                            </div>
                         </div>
-                        <div class="vote-section" onclick="event.stopPropagation()">
-                            <span style="font-size: 12px;">🔴 詐騙 ${question.scamVotes || 0}</span>
-                            <span style="font-size: 12px;">🟢 安全 ${question.safeVotes || 0}</span>
-                            <span style="font-size: 12px;">🟡 不確定 ${question.unsureVotes || 0}</span>
-                        </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
                 
                 container.innerHTML = `<p style="color: #6b7280; margin-bottom: 16px;">找到 <strong>${results.length}</strong> 個結果</p><div>${resultHtml}</div>`;
             }
@@ -1289,6 +1416,26 @@
                 switchTab(e.target.dataset.tab);
             });
         });
+
+        // 過濾標籤樣式修復
+        const style = document.createElement('style');
+        style.textContent = `
+            .filter-tag {
+                padding: 6px 12px;
+                background-color: var(--color-bg);
+                border: 1px solid var(--color-border);
+                border-radius: 8px;
+                font-size: 12px;
+                cursor: pointer;
+            }
+
+            .filter-tag.active {
+                background-color: var(--color-primary);
+                color: var(--color-white);
+                border-color: var(--color-primary);
+            }
+        `;
+        document.head.appendChild(style);
 
         // 初始化
         loadQuestions();
