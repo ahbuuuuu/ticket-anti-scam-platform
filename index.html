@@ -1,3 +1,5 @@
+html
+
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
@@ -70,6 +72,7 @@
             display: flex;
             gap: 16px;
             flex-wrap: wrap;
+            align-items: center;
         }
 
         .nav-btn {
@@ -90,6 +93,38 @@
         .nav-btn.active {
             color: var(--color-primary);
             border-bottom-color: var(--color-primary);
+        }
+
+        .auth-section {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-left: auto;
+        }
+
+        .user-info {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+
+        .btn-logout {
+            padding: 6px 12px;
+            background-color: var(--color-danger);
+            color: var(--color-white);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-login {
+            padding: 6px 12px;
+            background-color: var(--color-primary);
+            color: var(--color-white);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
         }
 
         .main-container {
@@ -163,6 +198,12 @@
             background-color: #2563eb;
         }
 
+        .btn-primary:disabled {
+            background-color: #cbd5e1;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .badge {
             display: inline-block;
             padding: 4px 8px;
@@ -192,6 +233,12 @@
             background-color: rgba(16, 185, 129, 0.1);
             border-color: var(--risk-low);
             color: #065f46;
+        }
+
+        .alert-warning {
+            background-color: rgba(245, 158, 11, 0.1);
+            border-color: var(--risk-medium);
+            color: #92400e;
         }
 
         .form-group {
@@ -257,8 +304,13 @@
             transition: all 0.2s;
         }
 
-        .vote-btn:hover {
+        .vote-btn:hover:not(:disabled) {
             background-color: var(--color-bg);
+        }
+
+        .vote-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         .vote-btn.scam { color: var(--risk-high); border-color: var(--risk-high); }
@@ -311,16 +363,97 @@
             font-size: 12px;
         }
 
+        .comment-btn:disabled {
+            background-color: #cbd5e1;
+            cursor: not-allowed;
+        }
+
         .loading {
             text-align: center;
             padding: 32px;
             color: var(--color-text-secondary);
         }
 
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--color-white);
+            padding: 32px;
+            border-radius: 12px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: var(--color-text);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--color-border);
+            background-color: var(--color-white);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background-color: var(--color-primary);
+            color: var(--color-white);
+            border-color: var(--color-primary);
+        }
+
+        .auth-tab {
+            display: none;
+        }
+
+        .auth-tab.active {
+            display: block;
+        }
+
         @media (max-width: 768px) {
             .navbar-menu { flex-direction: column; gap: 8px; width: 100%; }
             .nav-btn { font-size: 12px; padding: 6px 12px; }
             .main-container { padding: 16px; }
+            .auth-section { margin-left: 0; width: 100%; }
         }
     </style>
 </head>
@@ -333,6 +466,16 @@
                     <button class="nav-btn active" data-tab="dashboard">🏠 首頁</button>
                     <button class="nav-btn" data-tab="questions">❓ 詢問區</button>
                     <button class="nav-btn" data-tab="report">➕ 回報</button>
+                    
+                    <div class="auth-section">
+                        <div id="auth-status">
+                            <button class="btn-login" onclick="openAuthModal()">登入/註冊</button>
+                        </div>
+                        <div id="user-logged" style="display: none;">
+                            <span class="user-info">👤 <span id="user-email"></span></span>
+                            <button class="btn-logout" onclick="window.logout()">登出</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -477,8 +620,72 @@
         </main>
     </div>
 
+    <!-- 登入/註冊 Modal -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeAuthModal()">✕</button>
+            
+            <h2 class="modal-title">登入/註冊</h2>
+
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchAuthTab('login')">登入</button>
+                <button class="tab-btn" onclick="switchAuthTab('signup')">註冊</button>
+            </div>
+
+            <!-- 登入表單 -->
+            <div id="login-tab" class="auth-tab active">
+                <form id="login-form">
+                    <div class="form-group">
+                        <label class="form-label">📧 Email</label>
+                        <input type="email" id="login-email" class="form-input" placeholder="your@email.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">🔐 密碼</label>
+                        <input type="password" id="login-password" class="form-input" placeholder="至少6個字符" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">登入</button>
+                </form>
+            </div>
+
+            <!-- 註冊表單 -->
+            <div id="signup-tab" class="auth-tab">
+                <form id="signup-form">
+                    <div class="form-group">
+                        <label class="form-label">📧 Email</label>
+                        <input type="email" id="signup-email" class="form-input" placeholder="your@email.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">🔐 密碼</label>
+                        <input type="password" id="signup-password" class="form-input" placeholder="至少6個字符" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">確認密碼</label>
+                        <input type="password" id="signup-password-confirm" class="form-input" placeholder="再次輸入密碼" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">註冊</button>
+                </form>
+            </div>
+
+            <div id="auth-error" style="display: none; margin-top: 16px;">
+                <div class="alert alert-warning" id="auth-error-msg"></div>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword,
+            signOut,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
         // Firebase 配置
@@ -493,9 +700,98 @@
 
         // 初始化 Firebase
         const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
         const db = getFirestore(app);
 
         window.questions = [];
+        window.currentUser = null;
+
+        // 監聽認證狀態
+        onAuthStateChanged(auth, (user) => {
+            window.currentUser = user;
+            updateAuthUI();
+        });
+
+        // 更新 UI
+        function updateAuthUI() {
+            const authStatus = document.getElementById('auth-status');
+            const userLogged = document.getElementById('user-logged');
+
+            if (window.currentUser) {
+                authStatus.style.display = 'none';
+                userLogged.style.display = 'flex';
+                document.getElementById('user-email').textContent = window.currentUser.email;
+            } else {
+                authStatus.style.display = 'block';
+                userLogged.style.display = 'none';
+            }
+
+            renderQuestionsList();
+        }
+
+        // 登入
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                closeAuthModal();
+            } catch (error) {
+                showAuthError(error.message);
+            }
+        });
+
+        // 註冊
+        document.getElementById('signup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-password-confirm').value;
+
+            if (password !== confirmPassword) {
+                showAuthError('密碼不一致');
+                return;
+            }
+
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+                closeAuthModal();
+            } catch (error) {
+                showAuthError(error.message);
+            }
+        });
+
+        // 登出
+        window.logout = async function() {
+            await signOut(auth);
+        };
+
+        // Auth UI 函數
+        window.openAuthModal = function() {
+            document.getElementById('auth-modal').classList.add('active');
+        };
+
+        window.closeAuthModal = function() {
+            document.getElementById('auth-modal').classList.remove('active');
+            document.getElementById('auth-error').style.display = 'none';
+            document.getElementById('login-form').reset();
+            document.getElementById('signup-form').reset();
+        };
+
+        window.switchAuthTab = function(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tab + '-tab').classList.add('active');
+            event.target.classList.add('active');
+            document.getElementById('auth-error').style.display = 'none';
+        };
+
+        function showAuthError(message) {
+            document.getElementById('auth-error-msg').textContent = message;
+            document.getElementById('auth-error').style.display = 'block';
+        }
 
         // 加載問題列表
         function loadQuestions() {
@@ -513,9 +809,6 @@
                 
                 renderQuestionsList();
                 updateStats();
-            }, (error) => {
-                console.error("載入失敗:", error);
-                document.getElementById('questions-list').innerHTML = '<div class="alert alert-info">載入失敗，請檢查 Firebase 設置</div>';
             });
         }
 
@@ -542,6 +835,7 @@
                             <div style="display: flex; gap: 16px; font-size: 12px; color: var(--color-text-secondary); margin-top: 8px;">
                                 <span>💬 ${(question.comments || []).length} 則留言</span>
                                 <span>📅 ${question.created_at ? new Date(question.created_at.seconds * 1000).toLocaleDateString('zh-Hant') : '未知'}</span>
+                                <span>提問者: ${question.asker_email || '匿名'}</span>
                             </div>
                         </div>
                     </div>
@@ -551,13 +845,13 @@
                     </div>
 
                     <div class="vote-section">
-                        <button class="vote-btn scam" onclick="window.voteQuestion('${question.id}', 'scam')">
+                        <button class="vote-btn scam" onclick="window.voteQuestion('${question.id}', 'scam')" ${window.currentUser ? '' : 'disabled'} title="${window.currentUser ? '' : '需要登入才能投票'}">
                             🔴 詐騙 <span>${question.scamVotes || 0}</span>
                         </button>
-                        <button class="vote-btn safe" onclick="window.voteQuestion('${question.id}', 'safe')">
+                        <button class="vote-btn safe" onclick="window.voteQuestion('${question.id}', 'safe')" ${window.currentUser ? '' : 'disabled'} title="${window.currentUser ? '' : '需要登入才能投票'}">
                             🟢 安全 <span>${question.safeVotes || 0}</span>
                         </button>
-                        <button class="vote-btn unsure" onclick="window.voteQuestion('${question.id}', 'unsure')">
+                        <button class="vote-btn unsure" onclick="window.voteQuestion('${question.id}', 'unsure')" ${window.currentUser ? '' : 'disabled'} title="${window.currentUser ? '' : '需要登入才能投票'}">
                             🟡 不確定 <span>${question.unsureVotes || 0}</span>
                         </button>
                     </div>
@@ -566,8 +860,8 @@
                         <div style="font-weight: 600; margin-bottom: 8px;">💬 留言 (${(question.comments || []).length})</div>
                         
                         <div class="comment-form">
-                            <input type="text" class="comment-input" placeholder="寫下你的看法..." onkeypress="if(event.key==='Enter') window.addComment('${question.id}')">
-                            <button class="comment-btn" onclick="window.addComment('${question.id}')">發送</button>
+                            <input type="text" class="comment-input" placeholder="寫下你的看法..." onkeypress="if(event.key==='Enter') window.addComment('${question.id}')" ${window.currentUser ? '' : 'disabled'}>
+                            <button class="comment-btn" onclick="window.addComment('${question.id}')" ${window.currentUser ? '' : 'disabled'}>發送</button>
                         </div>
 
                         <div style="margin-top: 12px;">
@@ -609,6 +903,7 @@
                     seller_id: document.getElementById('question-seller').value,
                     platform: document.getElementById('question-platform').value,
                     content: document.getElementById('question-content').value,
+                    asker_email: window.currentUser ? window.currentUser.email : '匿名',
                     scamVotes: 0,
                     safeVotes: 0,
                     unsureVotes: 0,
@@ -632,6 +927,12 @@
 
         // 投票函數
         window.voteQuestion = async function(questionId, voteType) {
+            if (!window.currentUser) {
+                alert('需要登入才能投票');
+                window.openAuthModal();
+                return;
+            }
+
             const question = window.questions.find(q => q.id === questionId);
             if (!question) return;
 
@@ -651,6 +952,12 @@
 
         // 添加留言
         window.addComment = async function(questionId) {
+            if (!window.currentUser) {
+                alert('需要登入才能留言');
+                window.openAuthModal();
+                return;
+            }
+
             const question = window.questions.find(q => q.id === questionId);
             if (!question) return;
 
@@ -665,7 +972,7 @@
             try {
                 const comments = question.comments || [];
                 comments.push({
-                    author: '訪客' + Math.floor(Math.random() * 10000),
+                    author: window.currentUser.email,
                     text: text,
                     time: new Date().toLocaleString('zh-Hant')
                 });
@@ -683,11 +990,18 @@
         document.getElementById('report-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            if (!window.currentUser) {
+                alert('需要登入才能回報');
+                window.openAuthModal();
+                return;
+            }
+
             try {
                 await addDoc(collection(db, "reports"), {
                     seller_id: document.getElementById('seller_id').value,
                     platform: document.getElementById('platform').value,
                     description: document.getElementById('description').value,
+                    reporter_email: window.currentUser.email,
                     created_at: new Date()
                 });
 
@@ -738,3 +1052,28 @@
     </script>
 </body>
 </html>
+```
+
+---
+
+## 🚀 新功能说明
+
+✅ **查询** - 不需要登入，所有人都能看
+✅ **提问** - 不需要登入就能发，但会记录提问者邮箱
+✅ **投票** - 🔐 **需要登入**才能投票（按钮会禁用）
+✅ **留言** - 🔐 **需要登入**才能留言（输入框会禁用）
+✅ **回报** - 🔐 **需要登入**才能回报（表单提交时检查）
+
+---
+
+## 📥 部署步骤
+
+1. 复制上面的完整代码
+2. 进入 GitHub → 编辑 `index.html`
+3. 全选删除，粘贴新代码
+4. **Commit changes**
+5. 刷新网站测试！
+
+---
+
+**现在就部署吧！** 🚀
