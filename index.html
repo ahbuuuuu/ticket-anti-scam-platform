@@ -575,6 +575,14 @@
             border-color: var(--color-primary);
         }
 
+        .password-field {
+            display: block;
+        }
+
+        .password-field.hidden {
+            display: none;
+        }
+
         @media (max-width: 768px) {
             .navbar-menu { flex-direction: column; gap: 8px; width: 100%; }
             .nav-btn { font-size: 12px; padding: 6px 12px; }
@@ -805,22 +813,24 @@
             <h2 class="modal-title">登入/註冊</h2>
 
             <div class="tab-buttons">
-                <button class="tab-btn active" onclick="switchAuthTab('login')">一般登入</button>
+                <button class="tab-btn active" onclick="switchAuthTab('login')">登入</button>
                 <button class="tab-btn" onclick="switchAuthTab('signup')">註冊</button>
-                <button class="tab-btn" onclick="switchAuthTab('admin')">管理員</button>
             </div>
 
-            <!-- 一般登入表單 -->
+            <!-- 登入表單 -->
             <div id="login-tab" class="auth-tab active">
                 <form id="login-form">
                     <div class="form-group">
                         <label class="form-label">📧 Email</label>
-                        <input type="email" id="login-email" class="form-input" placeholder="your@email.com" required>
+                        <input type="email" id="login-email" class="form-input" placeholder="your@email.com" onchange="checkAdminEmail()" required>
+                        <small style="color: #6b7280; margin-top: 4px; display: block;">提示：如果是管理員邮箱，密碼欄會自動隱藏</small>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label">🔐 密碼</label>
-                        <input type="password" id="login-password" class="form-input" placeholder="至少6個字符" required>
+                    <div id="password-field" class="password-field">
+                        <div class="form-group">
+                            <label class="form-label">🔐 密碼</label>
+                            <input type="password" id="login-password" class="form-input" placeholder="至少6個字符" required>
+                        </div>
                     </div>
 
                     <button type="submit" class="btn btn-primary" style="width: 100%;">登入</button>
@@ -846,23 +856,6 @@
                     </div>
 
                     <button type="submit" class="btn btn-primary" style="width: 100%;">註冊</button>
-                </form>
-            </div>
-
-            <!-- 管理員登入表單 -->
-            <div id="admin-tab" class="auth-tab">
-                <form id="admin-form">
-                    <div class="alert alert-info">
-                        <strong>⚙️ 管理員模式</strong>
-                        <p style="margin-top: 8px; font-size: 14px;">只需輸入授權的管理員邮箱</p>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">📧 管理員 Email</label>
-                        <input type="email" id="admin-email" class="form-input" placeholder="admin@example.com" required>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary" style="width: 100%;">進入管理面板</button>
                 </form>
             </div>
 
@@ -902,8 +895,8 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // 管理員列表 - 修改這裡添加管理員邮箱
-        const ADMIN_EMAILS = ['admin@ticket-anti-scam.com'];
+        // 管理員邮箱 - 只需改這裡
+        const ADMIN_EMAIL = '4a670040us@gmail.com';
 
         window.questions = [];
         window.currentUser = null;
@@ -915,6 +908,21 @@
             window.currentUser = user;
             updateAuthUI();
         });
+
+        // 檢查是否是管理員邮箱
+        window.checkAdminEmail = function() {
+            const email = document.getElementById('login-email').value;
+            const passwordField = document.getElementById('password-field');
+            const passwordInput = document.getElementById('login-password');
+
+            if (email === ADMIN_EMAIL) {
+                passwordField.classList.add('hidden');
+                passwordInput.removeAttribute('required');
+            } else {
+                passwordField.classList.remove('hidden');
+                passwordInput.setAttribute('required', 'required');
+            }
+        };
 
         // 更新 UI
         function updateAuthUI() {
@@ -954,12 +962,24 @@
             const password = document.getElementById('login-password').value;
 
             try {
-                await signInWithEmailAndPassword(auth, email, password);
-                showAuthSuccess('登入成功！');
-                setTimeout(() => {
-                    closeAuthModal();
-                    switchTab('dashboard');
-                }, 1500);
+                // 如果是管理員邮箱，直接登入
+                if (email === ADMIN_EMAIL) {
+                    window.adminUser = email;
+                    showAuthSuccess('管理員登入成功！');
+                    setTimeout(() => {
+                        closeAuthModal();
+                        updateAuthUI();
+                        switchTab('admin');
+                    }, 1500);
+                } else {
+                    // 普通用戶需要密碼
+                    await signInWithEmailAndPassword(auth, email, password);
+                    showAuthSuccess('登入成功！');
+                    setTimeout(() => {
+                        closeAuthModal();
+                        switchTab('dashboard');
+                    }, 1500);
+                }
             } catch (error) {
                 showAuthError(error.message);
             }
@@ -994,24 +1014,6 @@
             }
         });
 
-        // 管理員登入
-        document.getElementById('admin-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = document.getElementById('admin-email').value;
-
-            if (ADMIN_EMAILS.includes(email)) {
-                window.adminUser = email;
-                showAuthSuccess('管理員登入成功！');
-                setTimeout(() => {
-                    closeAuthModal();
-                    updateAuthUI();
-                    switchTab('admin');
-                }, 1500);
-            } else {
-                showAuthError('此邮箱不是授權的管理員');
-            }
-        });
-
         // 登出
         window.logout = async function() {
             if (window.adminUser) {
@@ -1033,7 +1035,7 @@
             document.getElementById('auth-success').style.display = 'none';
             document.getElementById('login-form').reset();
             document.getElementById('signup-form').reset();
-            document.getElementById('admin-form').reset();
+            document.getElementById('password-field').classList.remove('hidden');
         };
 
         // 點擊背景關閉 Modal
@@ -1050,6 +1052,7 @@
             event.target.classList.add('active');
             document.getElementById('auth-error').style.display = 'none';
             document.getElementById('auth-success').style.display = 'none';
+            document.getElementById('password-field').classList.remove('hidden');
         };
 
         function showAuthError(message) {
@@ -1470,3 +1473,4 @@
     </script>
 </body>
 </html>
+
